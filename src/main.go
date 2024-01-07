@@ -11,7 +11,7 @@ import (
 type ServerHandler interface {
 	Address() string
 	IsAlive() bool
-	Serve(rw http.ResponseWriter, r *http.Request)
+	Serve(rw http.ResponseWriter, req *http.Request)
 }
 
 type server struct {
@@ -48,6 +48,34 @@ func handleErr(err error) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func (s *server) Address() string {
+	return s.addr
+}
+
+func (s *server) IsAlive() bool {
+	return true
+}
+
+func (s *server) Serve(rw http.ResponseWriter, req *http.Request) {
+	s.proxy.ServeHTTP(rw, req)
+}
+
+func (lb *LoadBalancer) getNextAvailableServer() ServerHandler {
+	server := lb.servers[lb.roundRobinCount%len(lb.servers)]
+	for !server.IsAlive() {
+		lb.roundRobinCount++
+		server = lb.servers[lb.roundRobinCount%len(lb.servers)]
+	}
+	lb.roundRobinCount++
+	return server
+}
+
+func (lb *LoadBalancer) serveProxy(rw http.ResponseWriter, req *http.Request) {
+	targetServer := lb.getNextAvailableServer()
+	fmt.Println("Forwarding request to: ", targetServer.Address())
+	targetServer.Serve(rw, req)
 }
 
 func main() {
