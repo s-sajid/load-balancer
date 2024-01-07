@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -43,9 +44,32 @@ func CreateLoadBalancer(num int) {
 	}
 
 	router.HandleFunc("/loadbalancer", makeRequest(&lb, &ep))
+	router.HandleFunc("/health", healthCheck(&ep))
 
-	fmt.Println("Load Balancer is up and running on port:", server.Addr)
+	fmt.Printf("The Load Balancer is live at http://localhost%s/loadbalancer\n", server.Addr)
+	fmt.Printf("The Health Check is live at http://localhost%s/health\n", server.Addr)
 	log.Fatal(server.ListenAndServe())
+}
+
+func healthCheck(ep *Endpoints) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		serverStatus := getServerStatus(ep)
+		fmt.Fprintf(w, "Server Status:\n%s", serverStatus)
+	}
+}
+
+func getServerStatus(ep *Endpoints) string {
+	var serverStatus strings.Builder
+
+	for _, endpoint := range ep.List {
+		status := "Alive"
+		if !testServer(endpoint.String()) {
+			status = "Dead"
+		}
+		serverStatus.WriteString(fmt.Sprintf("Server: %s, Status: %s\n", endpoint.String(), status))
+	}
+
+	return serverStatus.String()
 }
 
 func makeRequest(lb *LoadBalancer, ep *Endpoints) func(w http.ResponseWriter, r *http.Request) {

@@ -65,8 +65,5 @@ func CreateServers(sl *ServerList, wg *sync.WaitGroup, serverNumber int) {
 		w.Write([]byte("400: Server Shutdown"))
 		server.Shutdown(context.Background())
 	})
-
-	fmt.Printf("Server %d is running on port:808%d\n", serverNumber, port)
-
 	server.ListenAndServe()
 }
