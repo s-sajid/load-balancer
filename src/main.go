@@ -2,10 +2,17 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
 )
+
+type ServerHandler interface {
+	Address() string
+	IsAlive() bool
+	Serve(rw http.ResponseWriter, r *http.Request)
+}
 
 type server struct {
 	addr  string
@@ -20,6 +27,12 @@ func newServer(addr string) *server {
 		addr:  addr,
 		proxy: httputil.NewSingleHostReverseProxy(serverUrl),
 	}
+}
+
+type LoadBalancer struct {
+	port            string
+	roundRobinCount int
+	servers         []ServerHandler
 }
 
 func handleErr(err error) {
