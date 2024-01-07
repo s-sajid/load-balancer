@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"net/http/httputil"
 	"net/url"
+	"os"
 )
 
 type server struct {
@@ -17,5 +19,12 @@ func newServer(addr string) *server {
 	return &server{
 		addr:  addr,
 		proxy: httputil.NewSingleHostReverseProxy(serverUrl),
+	}
+}
+
+func handleErr(err error) {
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
