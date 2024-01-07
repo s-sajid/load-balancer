@@ -46,8 +46,8 @@ func CreateLoadBalancer(num int) {
 	router.HandleFunc("/loadbalancer", makeRequest(&lb, &ep))
 	router.HandleFunc("/health", healthCheck(&ep))
 
-	fmt.Printf("The Load Balancer is live at http://localhost%s/loadbalancer\n", server.Addr)
-	fmt.Printf("The Health Check is live at http://localhost%s/health\n", server.Addr)
+	fmt.Printf("The load balancer is live at http://localhost%s/loadbalancer\n", server.Addr)
+	fmt.Printf("To see the health of the servers, visit http://localhost%s/health\n", server.Addr)
 	log.Fatal(server.ListenAndServe())
 }
 
