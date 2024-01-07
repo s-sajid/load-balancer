@@ -35,9 +35,34 @@ type LoadBalancer struct {
 	servers         []ServerHandler
 }
 
+func NewLoadBalancer(port string, servers []ServerHandler) *LoadBalancer {
+	return &LoadBalancer{
+		port:            port,
+		roundRobinCount: 0,
+		servers:         servers,
+	}
+}
+
 func handleErr(err error) {
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func main() {
+	servers := []ServerHandler{
+		newServer("https://www.google.com/"),
+		newServer("https://www.bing.com/"),
+		newServer("https://www.yahoo.com/"),
+	}
+
+	lb := NewLoadBalancer("8000", servers)
+	handleRedirect := func(rw http.ResponseWriter, req *http.Request) {
+		lb.serveProxy(rw, req)
+	}
+	http.HandleFunc("/", handleRedirect)
+
+	fmt.Println("Server live on port:", lb.port)
+	http.ListenAndServe(":"+lb.port, nil)
 }
