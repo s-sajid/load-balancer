@@ -4,7 +4,7 @@ A round-robin load balancer with concurrent servers and live health checks.
 
 ## Quickstart
 
-To start the application: 
+To start the application:
 `go run main.go`
 
 ## Description
@@ -22,5 +22,3 @@ Additionally, the system has live health checks, which periodically assessing th
 Here is a screenshot of the health check page with 5 healthy servers:
 
 ![Health Check](assets/healthcheck.png)
-
-
