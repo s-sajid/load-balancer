@@ -13,7 +13,7 @@ This load balancer uses the round-robin algorithm to evenly distribute incoming 
 
 Requests are cyclically assigned to the servers that are healthy.
 
-![Round Robin Diagram](assets/roundrobin.png)
+![Round Robin Diagram](assets/round-robin.png)
 
 The servers are designed to handle multiple requests concurrently.
 
